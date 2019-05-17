@@ -131,6 +131,7 @@ class March:
         self.r = (self.r | self.rk)
         self.wall = sum([1 << i for i in range(0,8)]) | sum([1 << i for i in range(56,64)]) | sum([1 << i for i in range(0,64,8)]) | sum([1 << i for i in range(7,64,8)])
         self.turn = 0
+        self.lastmove = 0
    
     def __str__(self):
         s = "" 
@@ -215,6 +216,7 @@ class March:
         self.rk = self.rk & ~move
         self.reverseBoard()
         self.turn += 1
+        self.lastmove = reverse64bit(move)
     
     def movable(self, frm, to):
         if self.b & frm == 0:
@@ -339,6 +341,7 @@ class BoardGrid(GridLayout):
             for col in range(self.cols):
                 btn = GridButton()
                 btn.background_normal = "white.png" 
+                btn.font_size = 100
                 btn.value = 1<<(8*(row+1)+(col+1))
                 sub_buttons.append(btn)
                 self.add_widget(btn)
@@ -364,21 +367,21 @@ class BoardGrid(GridLayout):
                 else:
                     color = color_dict["space"]
                 self.buttons[row][col].background_color = color
+                if self.march.lastmove & address != 0:
+                    self.buttons[row][col].text = "•"
+                else:
+                    self.buttons[row][col].text = ""
+
         
 
 class BattleBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = "vertical"
-        #self.ti1 = URLTextInput1()
-        #self.ti1.size_hint_y = 0.5
-        #self.ti2 = URLTextInput2()
-        #self.ti2.size_hint_y = 0.5
         self.lbl1 = Label()
+        self.lbl1.background_color = color_dict["outside"]
         self.bw = BoardGrid()
         self.lbl2 = Label()
-        #self.add_widget(self.ti1)
-        #self.add_widget(self.ti2)
         self.add_widget(self.lbl1)
         self.add_widget(self.bw)
         self.add_widget(self.lbl2)
