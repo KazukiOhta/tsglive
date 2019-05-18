@@ -1,36 +1,58 @@
-from main import *
+import numpy as np
+import pprint
+import NN 
+import GA
+from copy import deepcopy
+def test():
+    mynet = NN.TwoLayerNet(2,4,1)
+    myX = np.array([1,100])
+    myY = mynet.forward(myX)    
+    print(myY)
+    mynet.mutate(1)
+    myY = mynet.forward(myX)
+    print(myY)
+    print(mynet.hoge)
+    mynet.hoge = 1
+    print(mynet.hoge)
+    print("="*50)
+    
+    agent1 = GA.Agent(mynet)
+    agent1.mutate()
 
-def match(AI0, AI1, show=False, AI0_name = "AI0", AI1_name = "AI1", reverse = True, random_opening = 0):
-    march = March()
-    for turn in range(100):
-        if show:
-            print("Turn:", turn)
-        if turn < random_opening:
-            frm, to = randomAI(march)
-        elif turn % 2 == 0:
-            frm, to = AI0(march)
-        else:
-            frm, to = AI1(march)
-        assert march.movable(frm, to)
-        march.move(frm^to)
-        if show:
-            if reverse:
-                print(AI1_name)
-                if turn % 2 == 0:
-                    march.reverseBoard()                    
-                print(march, AI0_name, sep = "")
-                if turn % 2 == 0:
-                    march.reverseBoard()      
-                print()
-            else:
-                print(AI0_name if turn % 2 == 0 else AI1_name)
-                print(march, AI1_name if turn % 2 == 0 else AI0_name, sep = "")
-                print()
-            print("richJudge:", march.richJudge())
-        j = march.judge()
-        if j == 1:
-            print("想定外")
-        elif j == -1:
-            return turn % 2 == 0 # means AI0 wins.
+#test()
+import RuleOfTicTacToe as Rule
+def testAgent():
+    mynet = NN.TwoLayerNet(27,20,1)
+    myX = Rule.initialState()
+    agent1 = GA.Agent(mynet)
+    pprint.pprint(agent1.move(myX))
 
-match(vanillaAI(filename="rich20k").move, vanillaAI(filename="rich20k").move, True)
+
+
+#testAgent()
+def testGA():
+    agents = [GA.Agent(NN.TwoLayerNet(27,20,1)) for i in range(20)]
+    weakagents = [GA.Agent(NN.TwoLayerNet(27,1,1)) for i in range(50)]
+
+    g = GA.Generation(agents, weakagents)
+    g.battle(weakagents)
+    for n in range(50):
+        best_agent = g.bestAgent()
+        print("#", n, best_agent.score1, best_agent.score2)
+        g = g.nextGeneration()
+
+    best_agent = g.bestAgent()
+    print("LAST:", best_agent.score1, best_agent.score2)
+    
+testGA()
+
+#import RuleOfMarch as Rule
+#def testTTT():
+#    i_s = Rule.initialState()
+#    cs = Rule.children(i_s)
+
+
+
+#testTTT()
+
+
