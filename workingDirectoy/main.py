@@ -36,6 +36,7 @@ class matrix():
         return str(self.matrix)
 
 
+
 """
 vanillaAI class
 """
@@ -95,11 +96,7 @@ class vanillaAI:
         y = u2.broadcast(sigmoid)
         return y.matrix
 
-def AImove(AI, march):
-    frm, to = AI.move(march)
-    march.move(frm^to)
-    if march.judge() != 0:
-        march = March()
+
 
 
 
@@ -242,6 +239,16 @@ class March:
         return children
 
 """
+AImove
+"""
+def AImove(AI, march):
+    frm, to = AI(march)#AI.move(march)
+    march.move(frm^to)
+    if march.judge() != 0:
+        march = March()
+
+
+"""
 Bit Board Manager
 """
 def bitprint(bit,name="    ",num=None):
@@ -322,7 +329,7 @@ class GridButton(Button):
         else:
             if self.parent.march.movable(self.parent.frm, self.value):
                 self.parent.march.move(self.parent.frm ^ self.value)
-                AImove(AI = self.parent.AI, march = self.parent.march)
+                AImove(AI = self.parent.parent.AI, march = self.parent.march)
             self.parent.frm = None
         if self.parent.march.judge() != 0:
             self.parent.march = March()
@@ -347,7 +354,6 @@ class BoardGrid(GridLayout):
                 self.add_widget(btn)
             self.buttons.append(sub_buttons)
         self.updateColor()
-        self.AI = vanillaAI(filename="AI")
         self.background_normal = "white.png" 
 
 
@@ -380,19 +386,37 @@ class BoardGrid(GridLayout):
                     if any([to & address != 0 for to in self.march.tos(self.frm)]):
                         self.buttons[row][col].color = color_dict["b"]
                         self.buttons[row][col].text = "•"
+
+class RedPlayerButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.value = 0
+        self.text = RedAINames[self.value]
+        self.font_size = 200
+    
+    def on_press(self):
+        RedAIDict = RedAIDictFunc()
+        self.value = (self.value + 1)%len(RedAIDict)
+        print(self.value)
+        self.parent.AI = RedAIDict[self.value]
+        self.parent.bw.march = March()
+        self.parent.bw.updateColor()
+        self.text = RedAINames[self.value]
         
+    
 
 class BattleBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = "vertical"
-        self.lbl1 = Label()
-        self.lbl1.background_color = color_dict["outside"]
+        self.redbtn = RedPlayerButton()
+        self.redbtn.background_color = color_dict["outside"]
         self.bw = BoardGrid()
         self.lbl2 = Label()
-        self.add_widget(self.lbl1)
+        self.add_widget(self.redbtn)
         self.add_widget(self.bw)
         self.add_widget(self.lbl2)
+        self.AI = RedAIDictFunc()[self.redbtn.value]
 
     def on_size(self, *args):
         self.bw.size_hint_y = None
@@ -412,5 +436,102 @@ class RootBox(BoxLayout):
 class MarchApp(App):
     def build(self):
         return RootBox()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+LIVE AI
+"""
+import numpy as np
+def RedAIDictFunc():
+    RedAIDict = [randomAI] #vanillaAI(filename="AI").move
+    return RedAIDict
+RedAINames = ["randomAI"]
+
+
+def randomAI(march):
+    while True:
+        frm = 1<<np.random.randint(64)
+        to = frm>>(9-np.random.randint(3))
+        if march.movable(frm, to):
+            return frm, to
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 MarchApp().run()
