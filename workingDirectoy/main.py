@@ -371,7 +371,15 @@ class BoardGrid(GridLayout):
                     self.buttons[row][col].text = "•"
                 else:
                     self.buttons[row][col].text = ""
-
+                self.buttons[row][col].color = color_dict["space"]
+                if self.frm == None:
+                    pass
+                else:
+                    if self.frm & address != 0:
+                        self.buttons[row][col].text = "•"
+                    if any([to & address != 0 for to in self.march.tos(self.frm)]):
+                        self.buttons[row][col].color = color_dict["b"]
+                        self.buttons[row][col].text = "•"
         
 
 class BattleBox(BoxLayout):
