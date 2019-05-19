@@ -499,9 +499,10 @@ LIVE AI
 """
 import numpy as np
 def RedAIDictFunc():
-    RedAIDict = [greedyAI, doubleCalculationAI, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
+    #RedAIDict = [greedyAI, doubleCalculationAI, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
+    RedAIDict = [greedyAI, doubleCalculationAI]#, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
     return RedAIDict
-RedAINames = ["greedyAI", "doubleCalculationAI", "singleCalculationAI", "randomAI"]
+RedAINames = ["greedyAI", "doubleCalculationAI"]#, "singleCalculationAI", "randomAI"]
 
 
 
@@ -572,7 +573,9 @@ def greedyEval(march):
 def greedyAI(march):
     bestmove = (0, 0)
     bestEval = -100000
-    for i in range(9, 55):
+    randlist = list(range(9, 55))
+    np.random.shuffle(randlist)
+    for i in randlist:
         frm = 1<<i
         if frm & march.b != 0:
             for to in march.tos(frm):
