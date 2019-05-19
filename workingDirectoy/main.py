@@ -392,7 +392,7 @@ class RedPlayerButton(Button):
         super().__init__(**kwargs)
         self.value = 0
         self.text = RedAINames[self.value]
-        self.font_size = 200
+        self.font_size = 75
     
     def on_press(self):
         RedAIDict = RedAIDictFunc()
@@ -404,6 +404,17 @@ class RedPlayerButton(Button):
         self.text = RedAINames[self.value]
         
     
+class BluePlayerButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.value = 0
+        self.font_size = 75
+
+    def on_press(self):
+        self.value = (self.value + 1) %2
+        self.text = ["", "Q-network"][self.value]
+        self.parent.bw.march = March()
+        self.parent.bw.updateColor()
 
 class BattleBox(BoxLayout):
     def __init__(self, **kwargs):
@@ -412,10 +423,10 @@ class BattleBox(BoxLayout):
         self.redbtn = RedPlayerButton()
         self.redbtn.background_color = color_dict["outside"]
         self.bw = BoardGrid()
-        self.lbl2 = Label()
+        self.bluebtn = BluePlayerButton()
         self.add_widget(self.redbtn)
         self.add_widget(self.bw)
-        self.add_widget(self.lbl2)
+        self.add_widget(self.bluebtn)
         self.AI = RedAIDictFunc()[self.redbtn.value]
 
     def on_size(self, *args):
@@ -483,7 +494,7 @@ LIVE AI
 """
 import numpy as np
 def RedAIDictFunc():
-    RedAIDict = [randomAI] #vanillaAI(filename="AI").move
+    RedAIDict = [randomAI, None] #vanillaAI(filename="AI").move
     return RedAIDict
 RedAINames = ["randomAI"]
 
