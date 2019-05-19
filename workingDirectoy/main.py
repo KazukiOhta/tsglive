@@ -499,9 +499,9 @@ LIVE AI
 """
 import numpy as np
 def RedAIDictFunc():
-    RedAIDict = [doubleCalculationAI, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
+    RedAIDict = [greedyAI, doubleCalculationAI, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
     return RedAIDict
-RedAINames = ["doubleCalculationAI", "singleCalculationAI", "randomAI"]
+RedAINames = ["greedyAI", "doubleCalculationAI", "singleCalculationAI", "randomAI"]
 
 
 
@@ -537,7 +537,7 @@ def singleCalculationAI(march):
 
     return randomAI(march)
 
-# 負けいかない。
+# 負けにいかない。
 def doubleCalculationAI(march):
     retVal = (0, 0)
     randlist = list(range(9, 55))
@@ -556,6 +556,38 @@ def doubleCalculationAI(march):
         return randomAI(march)
     else:
         return retVal
+
+
+# 取れるコマは絶対に取る！
+def greedyEval(march):
+    if march.richJudge() == 1:
+        return 10000
+    elif march.richJudge() == -1:
+        return -10000
+    blueEval = sum(np.array(list(bin(march.b)))=="1")
+    redEval = sum(np.array(list(bin(march.r)))=="1")
+    return blueEval - redEval #+np.random.randn()
+
+
+def greedyAI(march):
+    bestmove = (0, 0)
+    bestEval = -100000
+    for i in range(9, 55):
+        frm = 1<<i
+        if frm & march.b != 0:
+            for to in march.tos(frm):
+                child = March(march.b, march.r, march.bk, march.rk)
+                child.move(frm^to)
+                Eval = -greedyEval(child)
+                if Eval >= bestEval:
+                    bestmove = (frm, to)
+                    bestEval = Eval
+
+    print(bestEval)
+    if bestmove == (0, 0):
+        return randomAI(march)
+    else:
+        return bestmove
 
 
 
