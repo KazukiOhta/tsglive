@@ -394,7 +394,7 @@ class RedPlayerButton(Button):
         super().__init__(**kwargs)
         self.value = 0
         self.text = RedAINames[self.value]
-        self.font_size = 75
+        self.font_size = 25
     
     def on_press(self):
         RedAIDict = RedAIDictFunc()
