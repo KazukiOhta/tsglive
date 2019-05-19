@@ -496,9 +496,9 @@ LIVE AI
 """
 import numpy as np
 def RedAIDictFunc():
-    RedAIDict = [singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
+    RedAIDict = [doubleCalculationAI, singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
     return RedAIDict
-RedAINames = ["singleCalculationAI", "randomAI"]
+RedAINames = ["doubleCalculationAI", "singleCalculationAI", "randomAI"]
 
 
 
@@ -534,8 +534,20 @@ def singleCalculationAI(march):
 
     return randomAI(march)
 
-
-
+# 負けいかない。
+def doubleCalculationAI(march):
+    retVal = (0, 0)
+    for i in range(9, 55):
+        frm = 1<<i
+        if frm & march.b != 0:
+            for to in march.tos(frm):
+                child = March(march.b, march.r, march.bk, march.rk)
+                child.move(frm^to)
+                if child.richJudge() == -1:
+                    return (frm, to)
+                if child.richJudge() == 0:
+                    retVal = (frm, to)
+    return retVal
 
 
 
