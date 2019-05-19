@@ -245,7 +245,8 @@ def AImove(AI, march):
     frm, to = AI(march)#AI.move(march)
     march.move(frm^to)
     if march.judge() != 0:
-        march = March()
+        #march = March()
+        pass
 
 
 """
@@ -332,7 +333,8 @@ class GridButton(Button):
                 AImove(AI = self.parent.parent.AI, march = self.parent.march)
             self.parent.frm = None
         if self.parent.march.judge() != 0:
-            self.parent.march = March()
+            #self.parent.march = March()
+            pass
         self.parent.updateColor()
 
 class BoardGrid(GridLayout):
@@ -494,11 +496,23 @@ LIVE AI
 """
 import numpy as np
 def RedAIDictFunc():
-    RedAIDict = [randomAI] #vanillaAI(filename="AI").move
+    RedAIDict = [singleCalculationAI, randomAI] #vanillaAI(filename="AI").move
     return RedAIDict
-RedAINames = ["randomAI"]
+RedAINames = ["singleCalculationAI", "randomAI"]
 
 
+
+
+
+
+
+
+
+
+
+
+
+# ランダムなAI
 def randomAI(march):
     while True:
         frm = 1<<np.random.randint(64)
@@ -506,9 +520,19 @@ def randomAI(march):
         if march.movable(frm, to):
             return frm, to
 
+# 王手をかけていれば取る。(Working in Progress)
+def singleCalculationAI(march):
+    
+    for i in range(9, 55):
+        frm = 1<<i
+        if frm & march.b != 0:
+            for to in march.tos(frm):
+                child = March(march.b, march.r, march.bk, march.rk)
+                child.move(frm^to)
+                if child.judge() == -1:
+                    return (frm, to)
 
-
-
+    return randomAI(march)
 
 
 
