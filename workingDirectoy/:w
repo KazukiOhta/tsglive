@@ -245,8 +245,8 @@ def AImove(AI, march):
     frm, to = AI(march)#AI.move(march)
     march.move(frm^to)
     if march.judge() != 0:
-        march = March()
-
+        #march = March()
+        pass
 
 """
 Bit Board Manager
@@ -321,18 +321,29 @@ class URLTextInput2(TextInput):
 
 
 
+
 class GridButton(Button):
     def on_press(self):
-        if self.parent.frm == None:
-            if self.parent.march.b & self.value != 0:
-                self.parent.frm = self.value
-        else:
-            if self.parent.march.movable(self.parent.frm, self.value):
-                self.parent.march.move(self.parent.frm ^ self.value)
+        if self.parent.parent.bluebtn.value == 0:
+            if self.parent.frm == None:
+                if self.parent.march.b & self.value != 0:
+                    self.parent.frm = self.value
+            else:
+                if self.parent.march.movable(self.parent.frm, self.value):
+                    self.parent.march.move(self.parent.frm ^ self.value)
+                    AImove(AI = self.parent.parent.AI, march = self.parent.march)
+                self.parent.frm = None
+            if self.parent.march.judge() != 0:
+                #self.parent.march = March()
+                self.parent.parent.redbtn.GameSet(self.parent.march.judge() == 1)
+
+        if self.parent.parent.bluebtn.value == 1:
+            if self.parent.march.turn % 2 == 0:
+                AImove(AI = vanillaAI.move, march = self.parent.march)
+                self.parent.march.reverseBoard()
+            else:
                 AImove(AI = self.parent.parent.AI, march = self.parent.march)
-            self.parent.frm = None
-        if self.parent.march.judge() != 0:
-            self.parent.march = March()
+                self.parent.march.reverseBoard()
         self.parent.updateColor()
 
 class BoardGrid(GridLayout):
@@ -403,6 +414,11 @@ class RedPlayerButton(Button):
         self.parent.bw.updateColor()
         self.text = RedAINames[self.value]
         
+    def GameSet(self, BlueWin):
+        if BlueWin:
+            self.text = "Blue Win!"
+        else:
+            self.text = "Red Win!"
     
 class BluePlayerButton(Button):
     def __init__(self, **kwargs):
@@ -423,7 +439,7 @@ class BattleBox(BoxLayout):
         self.redbtn = RedPlayerButton()
         self.redbtn.background_color = color_dict["outside"]
         self.bw = BoardGrid()
-        self.bluebtn = Label()#BluePlayerButton()
+        self.bluebtn = BluePlayerButton()
         self.add_widget(self.redbtn)
         self.add_widget(self.bw)
         self.add_widget(self.bluebtn)
