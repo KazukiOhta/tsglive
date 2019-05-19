@@ -330,7 +330,10 @@ class GridButton(Button):
         else:
             if self.parent.march.movable(self.parent.frm, self.value):
                 self.parent.march.move(self.parent.frm ^ self.value)
-                AImove(AI = self.parent.parent.AI, march = self.parent.march)
+                if self.parent.march.judge() == 0:
+                    AImove(AI = self.parent.parent.AI, march = self.parent.march)
+                else:
+                    self.parent.march.reverseBoard()
             self.parent.frm = None
         if self.parent.march.judge() != 0:
             #self.parent.march = March()
@@ -537,7 +540,9 @@ def singleCalculationAI(march):
 # 負けいかない。
 def doubleCalculationAI(march):
     retVal = (0, 0)
-    for i in range(9, 55):
+    randlist = list(range(9, 55))
+    np.random.shuffle(randlist)
+    for i in randlist:
         frm = 1<<i
         if frm & march.b != 0:
             for to in march.tos(frm):
@@ -547,9 +552,10 @@ def doubleCalculationAI(march):
                     return (frm, to)
                 if child.richJudge() == 0:
                     retVal = (frm, to)
-    return retVal
-
-
+    if retVal == (0, 0):
+        return randomAI(march)
+    else:
+        return retVal
 
 
 
